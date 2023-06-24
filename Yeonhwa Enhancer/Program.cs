@@ -22,12 +22,6 @@ class Program
 
     static void Main()
     {
-        Console.WriteLine("Welcome to Yeonhwa Enhancer KMS V1.2.374 Developed by Indexed");
-        Thread.Sleep(1000);
-        Console.WriteLine("");
-        Console.WriteLine("Communicating with Yeonhwa Servers");
-        Thread.Sleep(2000);
-        Console.WriteLine("");
 
         try
         {
@@ -35,13 +29,7 @@ class Program
 
             IntPtr processHandle = OpenProcess(PROCESS_ALL_ACCESS, false, process.Id);
 
-            Console.WriteLine("Connected");
-            Console.WriteLine("");
-
-            Console.Clear();
-
-
-            /*List<IntPtr> addresses = new List<IntPtr>()
+            List<IntPtr> addresses = new List<IntPtr>()
             {
             new IntPtr((long)process.MainModule.BaseAddress + 0x5240EA0), //1st 3 Character Names
             new IntPtr((long)process.MainModule.BaseAddress + 0x46C6510), //Claw Damage
@@ -53,77 +41,19 @@ class Program
             new IntPtr((long)process.MainModule.BaseAddress + 0x46C64F8), //Gun, Cannon
             new IntPtr((long)process.MainModule.BaseAddress + 0x46C6508), //Knuckle, Soul Shooter, Arm Cannon/Revolver (Blaster)
 
-            };*/
+            };
 
-            IntPtr characterNameAddress = new IntPtr((long)process.MainModule.BaseAddress + 0x5240EA0);
+            //IntPtr characterNameAddress = new IntPtr((long)process.MainModule.BaseAddress + 0x5240EA0);
 
-            IntPtr address = new IntPtr((long)process.MainModule.BaseAddress + 0x5240EA0);
+            IntPtr characterDamageAddress = new IntPtr((long)process.MainModule.BaseAddress + 0x46C6510);
 
-            const int MAX_STRING_LENGTH = 256;
+            double newValue = 17.5;
+            byte[] newValueBytes = BitConverter.GetBytes(newValue);
 
-            byte[] buffer = new byte[MAX_STRING_LENGTH];
+            int bytesWritten;
+            bool successWriteMemory = WriteProcessMemory(processHandle, characterDamageAddress, newValueBytes, (uint)newValueBytes.Length, out bytesWritten);
 
-            int bytesRead;
-            bool successReadName = ReadProcessMemory(processHandle, address, buffer, buffer.Length, out bytesRead);
-            string characterName = "";
-            
-            if (successReadName)
-            {
-                characterName = System.Text.Encoding.Default.GetString(buffer);
-                characterName = characterName.Substring(0, characterName.IndexOf('\0'));  // Trim any null characters at the end
-                if (string.IsNullOrEmpty(characterName))
-                {
-                    Console.WriteLine("No Character Detected. Please log into the first 3 main characters");
-                }
-                else
-                {
-                    Console.WriteLine($"Character: {characterName} is detected");
-                }
-            }
-            else
-            {
-                Console.WriteLine("Failed.");
-            }
-
-
-            IntPtr characterDamageAddress = new IntPtr((long)process.MainModule.BaseAddress + 0x46C64C8);
-
-            if (characterName == "Smooth" || characterName == "Sorry")
-            {
-                Console.WriteLine("Character is authorized");
-                // Convert the new value to bytes
-                double newValue = 2.5;
-                byte[] newValueBytes = BitConverter.GetBytes(newValue);
-
-                int bytesWritten;
-                bool successWriteMemory = WriteProcessMemory(processHandle, characterDamageAddress, newValueBytes, (uint)newValueBytes.Length, out bytesWritten);
-
-                if (successWriteMemory)
-                {
-                    Console.WriteLine($"{characterName} is enhanced!");
-                }
-                else
-                {
-                    Console.WriteLine("Failed.");
-                }
-
-                CloseHandle(processHandle);
-            }
-            else
-            {
-                CloseHandle(processHandle);
-                if (string.IsNullOrEmpty (characterName))
-                {
-
-                }
-                else
-                {
-                    Console.WriteLine("Character is not authorized");
-                }
-                
-            }
-            
-            Console.ReadLine();
+            CloseHandle(processHandle);
         }
         catch (Exception ex)
         {
