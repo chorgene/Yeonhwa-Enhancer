@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.IO;
 
 class Program
 {
@@ -22,7 +22,6 @@ class Program
 
     static void Main()
     {
-
         try
         {
             Process process = Process.GetProcessesByName("MapleStory")[0];
@@ -40,14 +39,30 @@ class Program
             new IntPtr((long)process.MainModule.BaseAddress + 0x46C64F0), //Spear, Polearm, Great Sword (Lapis)
             new IntPtr((long)process.MainModule.BaseAddress + 0x46C64F8), //Gun, Cannon
             new IntPtr((long)process.MainModule.BaseAddress + 0x46C6508), //Knuckle, Soul Shooter, Arm Cannon/Revolver (Blaster)
-
             };
 
-            //IntPtr characterNameAddress = new IntPtr((long)process.MainModule.BaseAddress + 0x5240EA0);
+            IntPtr characterDamageAddress = new IntPtr((long)process.MainModule.BaseAddress + 0x46C64D8);
 
-            IntPtr characterDamageAddress = new IntPtr((long)process.MainModule.BaseAddress + 0x46C6510);
+            double newValue;
+            string configFileName = "config.txt";
 
-            double newValue = 17.5;
+            if (!File.Exists(configFileName))
+            {
+                File.WriteAllText(configFileName, "10");  // Create the file with default value of 10
+            }
+
+            // Read newValue from config.txt
+            try
+            {
+                string newValueString = File.ReadAllText(configFileName);
+                newValue = double.Parse(newValueString);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error reading newValue from config.txt: {e}");
+                return;
+            }
+
             byte[] newValueBytes = BitConverter.GetBytes(newValue);
 
             int bytesWritten;
@@ -61,6 +76,6 @@ class Program
             Console.WriteLine($"Error Message: {ex}");
             Console.ReadLine();
         }
-        
+
     }
 }
