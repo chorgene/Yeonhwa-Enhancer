@@ -33,28 +33,30 @@ namespace Yeonhwa_Enhancer
 
                 IntPtr processHandle = OpenProcess(PROCESS_ALL_ACCESS, false, process.Id);
 
-                List<IntPtr> addresses = new List<IntPtr>()
+                IntPtr characterName = new IntPtr((long)process.MainModule.BaseAddress + 0x5240EA0);
+
+                Dictionary<IntPtr, double> addressDictionary = new Dictionary<IntPtr, double>
                 {
-                new IntPtr((long)process.MainModule.BaseAddress + 0x5240EA0), //1st 3 Character Names
-                new IntPtr((long)process.MainModule.BaseAddress + 0x46C6510), //Claw Damage
-                new IntPtr((long)process.MainModule.BaseAddress + 0x46C64B8), //Wand, Staff, Shining Rod, Psy Limiter, Magic Gauntlet, One-handed Blunt Weapon Damage
-                new IntPtr((long)process.MainModule.BaseAddress + 0x46C64D0), //Two-handed Sword, Two-handed Axe
-                new IntPtr((long)process.MainModule.BaseAddress + 0x46C64C8), //Bow, Dagger, Dual Bowguns, Cane, Desperado, Energy Chain (Cadena), Ancient Bow, Buchae, Tuner, Breath Shooter
-                new IntPtr((long)process.MainModule.BaseAddress + 0x46C64D8), //Crossbow, Fan
-                new IntPtr((long)process.MainModule.BaseAddress + 0x46C64F0), //Spear, Polearm, Great Sword (Lapis)
-                new IntPtr((long)process.MainModule.BaseAddress + 0x46C64F8), //Gun, Cannon
-                new IntPtr((long)process.MainModule.BaseAddress + 0x46C6508), //Knuckle, Soul Shooter, Arm Cannon/Revolver (Blaster)
+                    { new IntPtr((long)process.MainModule.BaseAddress + 0x46C6510), 1.75 }, // Claw Damage Base Value = 1.75
+                    { new IntPtr((long)process.MainModule.BaseAddress + 0x46C64B8), 1.20 }, // Wand, Staff, Shining Rod, Psy Limiter, Magic Gauntlet, One-handed Blunt Weapon Damage Base Value = 1.20
+                    { new IntPtr((long)process.MainModule.BaseAddress + 0x46C64D0), 1.34 }, // Two-handed Sword, Two-handed Axe Base Value = 1.34
+                    { new IntPtr((long)process.MainModule.BaseAddress + 0x46C64C8), 1.30 }, // Bow, Dagger, Dual Bowguns, Cane, Desperado, Energy Chain (Cadena), Ancient Bow, Buchae, Tuner, Breath Shooter Base Value = 1.30
+                    { new IntPtr((long)process.MainModule.BaseAddress + 0x46C64D8), 1.35 }, // Crossbow, Fan Base Value = 1.35
+                    { new IntPtr((long)process.MainModule.BaseAddress + 0x46C64F0), 1.49 }, // Spear, Polearm, Great Sword (Lapis) Base Value = 1.49
+                    { new IntPtr((long)process.MainModule.BaseAddress + 0x46C64F8), 1.50 }, // Gun, Cannon Base Value = 1.50
+                    { new IntPtr((long)process.MainModule.BaseAddress + 0x46C6508), 1.70 }  // Knuckle, Soul Shooter, Arm Cannon/Revolver (Blaster) Base Value = 1.70
                 };
 
-                IntPtr characterDamageAddress = new IntPtr((long)process.MainModule.BaseAddress + 0x46C64D8);
+                double multiplier = Authentication.GetModifier();
+                byte[] newValueBytes = BitConverter.GetBytes(multiplier);
 
-                double newValue = 10;
-
-
-                byte[] newValueBytes = BitConverter.GetBytes(newValue);
-
-                int bytesWritten;
-                bool successWriteMemory = WriteProcessMemory(processHandle, characterDamageAddress, newValueBytes, (uint)newValueBytes.Length, out bytesWritten);
+                foreach (IntPtr address in addressDictionary.Keys)
+                {
+                    double oldValue = addressDictionary[address];
+                    double newValue = oldValue * multiplier;
+                    int bytesWritten;
+                    bool successWriteMemory = WriteProcessMemory(processHandle, address, newValueBytes, (uint)newValueBytes.Length, out bytesWritten);
+                }
 
                 CloseHandle(processHandle);
             }

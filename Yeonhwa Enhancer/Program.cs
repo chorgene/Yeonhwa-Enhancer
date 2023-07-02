@@ -21,15 +21,19 @@ class Program
         if (isAuthenticated)
         {
             Console.WriteLine($"Welcome {username}!");
-            Console.WriteLine($"Your current damage modification is 10%");
-            Console.WriteLine(Identifiers.GetProcessorId());
-            Console.WriteLine(Identifiers.GetDiskDriveId());
-            Console.WriteLine(Identifiers.GetHWID());
-            Console.WriteLine(Identifiers.GetIP());
-        }
-        else
-        {
-            Console.WriteLine("Invalid username/password. Please restart the program and try again");
+            Console.WriteLine($"Your current damage multiplier is {Authentication.GetModifier()}");
+            Console.WriteLine("");
+            Console.WriteLine("Press [Y] to start. Program will immediately exit if successful.");
+            string input = Console.ReadLine();
+            if (input == "Y")
+            {
+                DamageModification.ModifyDamage();
+            }
+            else
+            {
+                Console.WriteLine("Closing Program");
+                Thread.Sleep(5000);
+            }
         }
     }
 }

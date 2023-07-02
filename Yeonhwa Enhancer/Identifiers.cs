@@ -55,7 +55,7 @@ namespace Yeonhwa_Enhancer
             return hwProfileGuid;
         }
 
-        public static string GetIP()
+        /*ublic static string GetIP()
         {
             var host = Dns.GetHostEntry(Dns.GetHostName());
             foreach (var ip in host.AddressList)
@@ -63,6 +63,6 @@ namespace Yeonhwa_Enhancer
                 Console.WriteLine(ip.ToString());
             }
             return "cock";
-        }
+        }*/
     }
 }
