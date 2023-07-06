@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33723.286
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yeonhwa Enhancer", "Yeonhwa Enhancer\Yeonhwa Enhancer.csproj", "{C3A2CE6E-F2D5-44AB-916E-7EB097BB0DE1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "beta", "Yeonhwa Enhancer\beta.csproj", "{C3A2CE6E-F2D5-44AB-916E-7EB097BB0DE1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

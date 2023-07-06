@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Headers;
@@ -15,27 +16,20 @@ namespace Yeonhwa_Enhancer
         public static string globalPassword;
         public static double globalDamageModifier;
 
-        public static async Task UpdateHWID(string HWID, string password,double damageModifier)
+        static async Task UpdateHWID(string HWID)
         {
             string firebaseURL = $"https://yeonhwa-enhancer-default-rtdb.asia-southeast1.firebasedatabase.app/users/{globalUsername}.json";
-            // Create a new instance of HttpClient
+
             using (HttpClient client = new HttpClient())
             {
                 try
                 {
-                    // Create a sample data object to be posted
-                    var data = new { HWID = HWID, password = globalPassword, damageMultiplier = damageModifier};
+                    var data = new { HWID = HWID};
 
-                    // Convert the data object to JSON
                     string jsonData = JsonSerializer.Serialize(data);
 
-                    // Set the content type header to application/json
-                    //client.DefaultRequestHeaders.Add("ContentType", "application/json");
+                    HttpResponseMessage response = await client.PatchAsync(firebaseURL, new StringContent(jsonData));
 
-                    // Post the data to the Firebase URL
-                    HttpResponseMessage response = await client.PutAsync(firebaseURL, new StringContent(jsonData));
-
-                    // Check if the response was successful
                     if (response.IsSuccessStatusCode)
                     {
                         Console.WriteLine("First Time Login!");
@@ -102,7 +96,6 @@ namespace Yeonhwa_Enhancer
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
                 return false;
             }
         }
@@ -127,13 +120,12 @@ namespace Yeonhwa_Enhancer
 
             if (string.IsNullOrEmpty(HWID))
             {
-                GetModifier();
-                await Authentication.UpdateHWID(Identifiers.GetHWID(), globalPassword, globalDamageModifier);
+                await Authentication.UpdateHWID(GetHWID());
                 return true;
             }
             else
             {
-                if (HWID == Identifiers.GetHWID())
+                if (HWID == GetHWID())
                 {
                     return true;
                 }
@@ -154,6 +146,69 @@ namespace Yeonhwa_Enhancer
             damage = damageElement.GetDouble();
             globalDamageModifier = damage;
             return damage;
+        }
+
+        public static string GetHWID()
+        {
+            string registryPath = @"SYSTEM\CurrentControlSet\Control\IDConfigDB\Hardware Profiles\0001";
+            string valueName = "HwProfileGuid";
+            string hwProfileGuid = "";
+
+            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(registryPath))
+            {
+                if (key != null)
+                {
+                    object value = key.GetValue(valueName);
+                    if (value != null)
+                    {
+                        hwProfileGuid = value.ToString();
+                    }
+                }
+            }
+            return hwProfileGuid;
+        }
+
+        public static async Task UpdateLastLogin()
+        {
+            string firebaseURL = $"https://yeonhwa-enhancer-default-rtdb.asia-southeast1.firebasedatabase.app/users/{globalUsername}.json";
+
+            using (HttpClient client = new HttpClient())
+            {
+                try
+                {
+                    DateTime now = DateTime.Now;
+                    var data = new { lastLogin = $"{now.Day}{GetDaySuffix(now.Day)} {now.ToString("MMMM yyyy")} {now.ToString("hh:mm:ss")} {now.ToString("tt")}" };
+
+                    string jsonData = JsonSerializer.Serialize(data);
+
+                    HttpResponseMessage response = await client.PatchAsync(firebaseURL, new StringContent(jsonData));
+
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("An error occurred: ");
+                }
+            }
+        }
+
+        public static string GetDaySuffix(int day)
+        {
+            if (day >= 11 && day <= 13)
+            {
+                return "th";
+            }
+
+            switch (day % 10)
+            {
+                case 1:
+                    return "st";
+                case 2:
+                    return "nd";
+                case 3:
+                    return "rd";
+                default:
+                    return "th";
+            }
         }
     }
 }
