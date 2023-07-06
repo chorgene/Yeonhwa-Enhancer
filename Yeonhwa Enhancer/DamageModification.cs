@@ -47,12 +47,14 @@ namespace Yeonhwa_Enhancer
                     { new IntPtr((long)process.MainModule.BaseAddress + 0x46C6508), 1.70 }  // Knuckle, Soul Shooter, Arm Cannon/Revolver (Blaster) Base Value = 1.70 | 7
                 };
 
-                double multiplier = Authentication.GetModifier();
+                
                 int weapon = Authentication.GetWeapon();
 
                 KeyValuePair<IntPtr, double> weaponItem = addressDictionary.ElementAt(weapon);
                 IntPtr damageAddress = weaponItem.Key;
                 double damageValue = weaponItem.Value;
+
+                double multiplier = Authentication.GetModifier() * damageValue;
 
                 byte[] multiplierBytes = BitConverter.GetBytes(multiplier);
                 int bytesWritten;
@@ -63,7 +65,7 @@ namespace Yeonhwa_Enhancer
             catch (Exception ex)
             {
                 Console.WriteLine($"Something went wrong. Please contact the developer.");
-                Console.WriteLine($"Error Message: {ex}");
+                Console.WriteLine(ex);
                 Console.ReadLine();
             }
         }

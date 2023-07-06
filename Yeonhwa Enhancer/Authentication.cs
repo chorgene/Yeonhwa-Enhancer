@@ -191,6 +191,16 @@ namespace Yeonhwa_Enhancer
             }
         }
 
+        public static int GetWeapon()
+        {
+            JsonElement root = document.RootElement;
+            JsonElement weaponElement = root.GetProperty("weapon");
+
+            string weapon = weaponElement.GetString();
+            int weaponIndex = int.Parse(weapon);
+            return weaponIndex;
+        }
+
         public static string GetDaySuffix(int day)
         {
             if (day >= 11 && day <= 13)

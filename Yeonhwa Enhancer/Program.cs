@@ -20,7 +20,6 @@ class Program
 
         if (isAuthenticated)
         {
-            await Authentication.UpdateLastLogin();
             Console.Clear();
             Console.WriteLine($"Welcome {username}!");
             Console.WriteLine($"Your current damage multiplier is {Authentication.GetModifier()}");
@@ -30,6 +29,7 @@ class Program
             if (input.ToUpper() == "Y")
             {
                 DamageModification.ModifyDamage();
+                await Authentication.UpdateLastLogin();
             }
             else
             {
